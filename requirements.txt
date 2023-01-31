@@ -1,3 +1,4 @@
+imageio==2.25.0
+numpy==1.22.3
 qrcode==7.3.1
 tqdm==4.61.0
-Pillow==9.1.0

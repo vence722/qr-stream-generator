@@ -3,10 +3,13 @@ import qrcode
 import zlib
 import os
 import tqdm
+import imageio
+import numpy as np
 config = {}
 config["is_zip"] = False
 config["chunk_str_size"] = 100
 config["output_dir"] = "staging/stg_e/20230131_1058"
+config["gif_duration"] = 0.5
 
 # %%
 
@@ -48,7 +51,13 @@ if __name__ == '__main__':
 
     
     chunk_str_size = config["chunk_str_size"]
+    img_ls = []
     for i in tqdm.tqdm(range(round(len(in_str) /  chunk_str_size + 0.5))):
         img = qrcode.make(f"[TIME_TOKEN_{i}]\n" + in_str[i * chunk_str_size : (i + 1) * chunk_str_size])
-        img.save(f'{config["output_dir"]}/out_{i}.png')
+        img_path = f'{config["output_dir"]}/out_{i}.png'
+        img.save(img_path)
+        img_ls.append(imageio.imread(img_path))
+
+    imageio.mimsave(f'{config["output_dir"]}/all.gif', img_ls, duration = config["gif_duration"])
+    print('Done.')
 
