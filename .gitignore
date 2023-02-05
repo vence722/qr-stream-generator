@@ -1,4 +1,5 @@
 .vscode
+# Backend (python) ignore
 notebook
 notebook/main.ipynb
 staging/
