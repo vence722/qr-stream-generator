@@ -5,6 +5,7 @@ import os
 import tqdm
 import imageio
 import numpy as np
+import hashlib
 config = {}
 config["is_zip"] = False
 config["chunk_str_size"] = 100
@@ -18,7 +19,7 @@ if __name__ == '__main__':
     if not os.path.exists(config["output_dir"]):
         os.makedirs(config["output_dir"])
 
-
+    file_name = '001.txt'
     in_str = '''
         def get_tr_iter(train_data, FLAGS, NodeMinibatchIterator):
             G = train_data[0]
@@ -49,11 +50,14 @@ if __name__ == '__main__':
     if config["is_zip"]:
         in_str = zlib.compress(in_str.encode('utf-8'))
 
-    
+    hash_file_name = hashlib.md5(file_name.encode('utf-8')).hexdigest()
     chunk_str_size = config["chunk_str_size"]
+    
     img_ls = []
-    for i in tqdm.tqdm(range(round(len(in_str) /  chunk_str_size + 0.5))):
-        img = qrcode.make(f"[TIME_TOKEN_{i}]\n" + in_str[i * chunk_str_size : (i + 1) * chunk_str_size])
+    total_size = round(len(in_str) /  chunk_str_size + 0.5)
+    for i in tqdm.tqdm(range(total_size)):
+        _header = f"[{file_name}:{hash_file_name}:{i + 1}:{total_size}]"
+        img = qrcode.make(_header + in_str[i * chunk_str_size : (i + 1) * chunk_str_size])
         img_path = f'{config["output_dir"]}/out_{i}.png'
         img.save(img_path)
         img_ls.append(imageio.imread(img_path))
